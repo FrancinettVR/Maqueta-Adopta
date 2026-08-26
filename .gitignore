@@ -1,0 +1,5 @@
+# Ignorar carpeta materia
+materia/
+
+# Ignorar documento relatos.md
+relatos.md

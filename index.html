@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Adopta - Adopción y Artículos para Gatos</title>
+  
+  <!-- Google Fonts Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- App Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Application Viewport Container -->
+  <div class="app-viewport">
+    
+    <!-- Top Header -->
+    <header class="app-header">
+      <button class="menu-toggle-btn" id="menuToggleBtn" title="Abrir Menú Lateral">
+        <i class="fas fa-bars"></i>
+      </button>
+      <div class="brand-logo">
+        <i class="fas fa-paw"></i>
+        <span>Adopta</span>
+      </div>
+      <div style="width: 42px;"><!-- Spacing balance --></div>
+    </header>
+
+    <!-- Main Content Feed -->
+    <main class="main-content">
+      
+      <!-- Search & Filters Section -->
+      <section class="search-filter-section">
+        <div class="search-bar">
+          <i class="fas fa-search" style="color: var(--text-muted);"></i>
+          <input type="text" placeholder="Buscar gatos en adopción, areneros, rascadores...">
+        </div>
+        
+        <!-- Filter Selector Menu -->
+        <div class="filter-dropdown-wrapper">
+          <i class="fas fa-sliders-h"></i>
+          <label for="filterSelect" class="filter-label">Filtrar por:</label>
+          <select class="filter-select" id="filterSelect" onchange="filterPosts(this.value)">
+            <option value="todos">Todos los elementos</option>
+            <option value="cerca">Cerca de mí</option>
+            <option value="gatitos">Gatitos (&lt; 6 meses)</option>
+            <option value="areneros">Areneros</option>
+            <option value="rascadores">Rascadores</option>
+            <option value="accesorios">Accesorios</option>
+          </select>
+        </div>
+      </section>
+
+      <!-- Dynamic Section Title -->
+      <div class="section-title">
+        <span id="feedTitle">Publicaciones de Adopción</span>
+      </div>
+
+      <!-- Feed List Container -->
+      <div class="posts-feed" id="postsFeed">
+        <!-- Rendered dynamically by app.js -->
+      </div>
+
+    </main>
+
+    <!-- Bottom Navigation Bar (Menú inferior) -->
+    <nav class="bottom-nav">
+      <button class="nav-item active" id="navAdopciones">
+        <i class="fas fa-cat"></i>
+        <span>Adopciones</span>
+      </button>
+      
+      <button class="nav-item-add" id="navAdd" title="Crear Publicación">
+        <i class="fas fa-plus"></i>
+      </button>
+      
+      <button class="nav-item" id="navArticulos">
+        <i class="fas fa-box-open"></i>
+        <span>Artículos</span>
+      </button>
+    </nav>
+
+    <!-- Modal: Pantalla de Menú y Secciones -->
+    <div class="modal-overlay" id="menuScreenModal">
+      <div class="modal-container">
+        <div class="modal-header">
+          <span class="modal-title">Menú Principal</span>
+          <button class="modal-close-btn"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+          
+          <!-- State Switcher Header -->
+          <div class="drawer-header" style="border-radius: var(--radius-lg); margin-bottom: 16px;">
+            <div id="drawerUserSection">
+              <!-- Rendered by app.js depending on Visitor/User state -->
+            </div>
+            <div class="visitor-switch">
+              <span>Simular Estado:</span>
+              <button class="switch-toggle-btn" id="userModeToggleBtn">Ver como Visitante</button>
+            </div>
+          </div>
+
+          <!-- Menu Sections Container -->
+          <div class="menu-screen-grid">
+            
+            <!-- Visitor Item -->
+            <div class="menu-section-card drawer-visitor-only" onclick="openModal('loginModal')">
+              <div class="menu-card-left">
+                <div class="menu-card-icon"><i class="fas fa-sign-in-alt"></i></div>
+                <div>
+                  <div class="menu-card-title">Iniciar Sesión</div>
+                  <div class="menu-card-desc">Accede a tu cuenta de usuario</div>
+                </div>
+              </div>
+              <i class="fas fa-chevron-right" style="color:var(--text-muted);"></i>
+            </div>
+
+            <!-- Registered User Items -->
+            <div class="menu-section-card drawer-user-only" onclick="openModal('myPostsModal')">
+              <div class="menu-card-left">
+                <div class="menu-card-icon"><i class="fas fa-folder-open"></i></div>
+                <div>
+                  <div class="menu-card-title">Mis Publicaciones</div>
+                  <div class="menu-card-desc">Ver y gestionar tus publicaciones en cuadrícula</div>
+                </div>
+              </div>
+              <i class="fas fa-chevron-right" style="color:var(--text-muted);"></i>
+            </div>
+
+            <div class="menu-section-card drawer-user-only" onclick="openModal('myRequestsModal')">
+              <div class="menu-card-left">
+                <div class="menu-card-icon"><i class="fas fa-paper-plane"></i></div>
+                <div>
+                  <div class="menu-card-title">Mis Solicitudes</div>
+                  <div class="menu-card-desc">Revisar el estado de tus solicitudes enviadas</div>
+                </div>
+              </div>
+              <i class="fas fa-chevron-right" style="color:var(--text-muted);"></i>
+            </div>
+
+            <div class="menu-section-card drawer-user-only" onclick="openModal('chatModal')">
+              <div class="menu-card-left">
+                <div class="menu-card-icon"><i class="fas fa-comments"></i></div>
+                <div>
+                  <div class="menu-card-title">Chat (Solicitudes Aceptadas)</div>
+                  <div class="menu-card-desc">Salas de conversación activa con otros usuarios</div>
+                </div>
+              </div>
+              <i class="fas fa-chevron-right" style="color:var(--text-muted);"></i>
+            </div>
+
+            <div class="menu-section-card drawer-user-only" onclick="openModal('profileModal')">
+              <div class="menu-card-left">
+                <div class="menu-card-icon"><i class="fas fa-user-circle"></i></div>
+                <div>
+                  <div class="menu-card-title">Mi Perfil</div>
+                  <div class="menu-card-desc">Ver tu perfil, reseñas e historial</div>
+                </div>
+              </div>
+              <i class="fas fa-chevron-right" style="color:var(--text-muted);"></i>
+            </div>
+
+            <div class="menu-section-card drawer-user-only" onclick="openModal('formModal')">
+              <div class="menu-card-left">
+                <div class="menu-card-icon"><i class="fas fa-file-alt"></i></div>
+                <div>
+                  <div class="menu-card-title">Mi Formulario</div>
+                  <div class="menu-card-desc">Formulario de adopción y datos de hogar</div>
+                </div>
+              </div>
+              <i class="fas fa-chevron-right" style="color:var(--text-muted);"></i>
+            </div>
+
+            <div class="menu-section-card drawer-user-only" onclick="openModal('accountModal')">
+              <div class="menu-card-left">
+                <div class="menu-card-icon"><i class="fas fa-cog"></i></div>
+                <div>
+                  <div class="menu-card-title">Mi Cuenta</div>
+                  <div class="menu-card-desc">Ajustes de cuenta y datos personales</div>
+                </div>
+              </div>
+              <i class="fas fa-chevron-right" style="color:var(--text-muted);"></i>
+            </div>
+
+            <div class="menu-section-card drawer-user-only" onclick="openModal('savedPostsModal')">
+              <div class="menu-card-left">
+                <div class="menu-card-icon"><i class="fas fa-bookmark"></i></div>
+                <div>
+                  <div class="menu-card-title">Mis Publicaciones Guardadas</div>
+                  <div class="menu-card-desc">Publicaciones que has guardado en favoritos</div>
+                </div>
+              </div>
+              <i class="fas fa-chevron-right" style="color:var(--text-muted);"></i>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Publicación de Adopción (Detalle) -->
+    <div class="modal-overlay" id="adoptionDetailModal">
+      <div class="modal-container">
+        <div class="modal-header">
+          <span class="modal-title" id="detailPetName">Oliver</span>
+          <button class="modal-close-btn"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+          
+          <!-- Main Photo / Gallery -->
+          <div class="gallery-container">
+            <img src="./images/cat_orange.jpg" id="detailImage" alt="Foto gato">
+          </div>
+
+          <!-- Publisher Info -->
+          <div class="publisher-card">
+            <div class="publisher-info">
+              <div class="publisher-avatar" id="detailUserAvatar">C</div>
+              <div>
+                <div style="font-weight: 700;" id="detailUser">Camila R.</div>
+                <div class="reputation-badge" id="detailReputation">★ 4.9 (18 reseñas)</div>
+              </div>
+            </div>
+            <span style="font-size: 0.8rem; color: var(--text-muted);" id="detailDate">Hace 2 días</span>
+          </div>
+
+          <!-- Pet Specifications Grid -->
+          <div class="pet-details-grid">
+            <div class="detail-item">
+              <span class="label">Edad</span>
+              <span class="value" id="detailAge">4 Meses</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">Color</span>
+              <span class="value" id="detailColor">Naranjito Atigrado</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">Tamaño</span>
+              <span class="value" id="detailSize">Pequeño</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">Ubicación</span>
+              <span class="value" id="detailLocation">Providencia, Santiago</span>
+            </div>
+          </div>
+
+          <!-- Socialization Index (Verde, Celeste, Amarillo, Rojo) -->
+          <div style="margin-bottom: 16px;">
+            <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-main);">Índice de Socialización:</span>
+            <div class="social-index-selector" id="socialPills">
+              <div class="social-pill social-verde" data-level="Verde">Verde (Muy sociable)</div>
+              <div class="social-pill social-celeste" data-level="Celeste">Celeste (Dócil)</div>
+              <div class="social-pill social-amarillo" data-level="Amarillo">Amarillo (Tímido)</div>
+              <div class="social-pill social-rojo" data-level="Rojo">Rojo (Requiere manejo)</div>
+            </div>
+          </div>
+
+          <!-- Description -->
+          <div style="margin-bottom: 20px;">
+            <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-main); display: block; margin-bottom: 4px;">Descripción:</span>
+            <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.5;" id="detailDescription">
+              Oliver es un gatito muy juguetón y amoroso. Acostumbrado a vivir dentro de casa.
+            </p>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="action-buttons-group">
+            <button class="btn-primary" onclick="alert('¡Solicitud enviada al usuario!'); document.getElementById('adoptionDetailModal').classList.remove('active');">
+              <i class="fas fa-heart"></i> Solicitar
+            </button>
+            <button class="btn-outline" onclick="alert('Publicación guardada en tus favoritos.');">
+              <i class="fas fa-bookmark"></i> Guardar
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Mis Publicaciones -->
+    <div class="modal-overlay" id="myPostsModal">
+      <div class="modal-container">
+        <div class="modal-header">
+          <span class="modal-title">Mis Publicaciones</span>
+          <button class="modal-close-btn"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+            <p style="font-size:0.85rem; color:var(--text-muted); margin:0;">
+              Publicaciones activas creadas por ti:
+            </p>
+            <div class="view-mode-toggle">
+              <button class="view-mode-btn active" id="myPostsGridBtn" onclick="toggleMyPostsView('grid')">
+                <i class="fas fa-th-large"></i> Cuadrícula
+              </button>
+              <button class="view-mode-btn" id="myPostsListBtn" onclick="toggleMyPostsView('list')">
+                <i class="fas fa-list"></i> Lista
+              </button>
+            </div>
+          </div>
+
+          <!-- Grid Container for User Posts -->
+          <div class="posts-grid" id="myPostsContainer">
+            
+            <!-- Grid Card 1: Oliver -->
+            <div class="grid-post-card" style="cursor:pointer;" onclick="openMyPostDetail('oliver')">
+              <div class="grid-post-img-wrapper">
+                <span class="badge-tag adopcion">Adopción</span>
+                <img src="./images/cat_orange.jpg" alt="Oliver">
+              </div>
+              <div class="grid-post-body">
+                <div>
+                  <div class="grid-post-title">Oliver (Gato Naranjo)</div>
+                  <div class="grid-post-meta">
+                    <i class="fas fa-clock"></i> Hace 2 días
+                  </div>
+                </div>
+                <button class="btn-primary" style="padding:6px 8px; font-size:0.75rem; width:100%; margin-top:6px;" onclick="event.stopPropagation(); showRequestsForPost('Oliver')">
+                  <i class="fas fa-envelope"></i> Solicitudes (2)
+                </button>
+              </div>
+            </div>
+
+            <!-- Grid Card 2: Arenero -->
+            <div class="grid-post-card" style="cursor:pointer;" onclick="openMyPostDetail('arenero')">
+              <div class="grid-post-img-wrapper">
+                <span class="badge-tag articulo">Artículo</span>
+                <img src="./images/cat_litter_box.jpg" alt="Arenero">
+              </div>
+              <div class="grid-post-body">
+                <div>
+                  <div class="grid-post-title">Arenero Automático</div>
+                  <div class="grid-post-meta">
+                    <i class="fas fa-clock"></i> Hace 1 día
+                  </div>
+                </div>
+                <button class="btn-primary" style="padding:6px 8px; font-size:0.75rem; width:100%; margin-top:6px;" onclick="event.stopPropagation(); showRequestsForPost('Arenero Automático')">
+                  <i class="fas fa-envelope"></i> Solicitudes (1)
+                </button>
+              </div>
+            </div>
+
+            <!-- Grid Card 3: Mimi -->
+            <div class="grid-post-card" style="cursor:pointer;" onclick="openMyPostDetail('mimi')">
+              <div class="grid-post-img-wrapper">
+                <span class="badge-tag adopcion">Adopción</span>
+                <img src="./images/cat_white.jpg" alt="Mimi">
+              </div>
+              <div class="grid-post-body">
+                <div>
+                  <div class="grid-post-title">Mimi (Gatita Blanca)</div>
+                  <div class="grid-post-meta">
+                    <i class="fas fa-clock"></i> Hace 4 días
+                  </div>
+                </div>
+                <button class="btn-primary" style="padding:6px 8px; font-size:0.75rem; width:100%; margin-top:6px;" onclick="event.stopPropagation(); showRequestsForPost('Mimi')">
+                  <i class="fas fa-envelope"></i> Solicitudes (0)
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Mis Solicitudes -->
+    <div class="modal-overlay" id="myRequestsModal">
+      <div class="modal-container">
+        <div class="modal-header">
+          <span class="modal-title">Mis Solicitudes</span>
+          <button class="modal-close-btn"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+          <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:14px;">
+            Solicitudes enviadas a otros usuarios para adopción o intercambio:
+          </p>
+
+          <div class="request-item">
+            <div style="display:flex; gap:12px; align-items:center;">
+              <img src="./images/cat_white.jpg" style="width:48px; height:48px; border-radius:8px; object-fit:cover;" alt="Mimi">
+              <div>
+                <div style="font-weight:700;">Solicitud por Gatita Mimi</div>
+                <div style="font-size:0.8rem; color:var(--text-muted);">Publicado por Felipe S. • Ñuñoa</div>
+                <span class="badge-tag" style="position:static; background:#f59e0b; font-size:0.7rem;">En revisión</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="request-item" style="margin-top:10px;">
+            <div style="display:flex; gap:12px; align-items:center;">
+              <img src="./images/cat_orange.jpg" style="width:48px; height:48px; border-radius:8px; object-fit:cover;" alt="Oliver">
+              <div>
+                <div style="font-weight:700;">Solicitud por Gato Oliver</div>
+                <div style="font-size:0.8rem; color:var(--text-muted);">Publicado por Camila R. • Providencia</div>
+                <span class="badge-tag" style="position:static; background:var(--social-verde); font-size:0.7rem;">¡Aceptada!</span>
+              </div>
+            </div>
+            <button class="btn-primary" style="padding:6px 10px; font-size:0.8rem;" onclick="document.getElementById('myRequestsModal').classList.remove('active'); openModal('chatModal');">
+              <i class="fas fa-comments"></i> Ir al Chat
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Chat (Solicitudes Aceptadas) -->
+    <div class="modal-overlay" id="chatModal">
+      <div class="modal-container">
+        <div class="modal-header">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <div class="publisher-avatar">C</div>
+            <div>
+              <span class="modal-title" style="font-size:1rem; display:block;">Camila R.</span>
+              <span style="font-size:0.75rem; color:var(--social-verde); font-weight:600;">Adopción Oliver • Solicitud Aceptada</span>
+            </div>
+          </div>
+          <button class="modal-close-btn"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body" style="padding:12px;">
+          <div class="chat-window">
+            <div class="chat-messages" id="chatMessages">
+              <div class="chat-bubble received">
+                ¡Hola María! Vi tu solicitud para adoptar a Oliver. Me alegra mucho tu interés.
+              </div>
+              <div class="chat-bubble sent">
+                ¡Hola Camila! Muchas gracias. Tengo departamento con mallas de seguridad y mucha experiencia con gatos.
+              </div>
+              <div class="chat-bubble received">
+                ¡Excelente! Tu formulario está muy completo. ¿Podemos coordinar la visita de adopción para este fin de semana?
+              </div>
+            </div>
+            <form class="chat-input-bar" onsubmit="sendChatMessage(event)">
+              <input type="text" id="chatInputText" placeholder="Escribe un mensaje..." required>
+              <button class="btn-primary" style="padding:8px 14px; font-size:0.9rem;" type="submit">
+                <i class="fas fa-paper-plane"></i>
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Mi Formulario -->
+    <div class="modal-overlay" id="formModal">
+      <div class="modal-container">
+        <div class="modal-header">
+          <span class="modal-title">Mi Formulario de Adopción</span>
+          <button class="modal-close-btn"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+          <form onsubmit="event.preventDefault(); alert('¡Formulario de adopción guardado con éxito!'); document.getElementById('formModal').classList.remove('active');">
+            <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:14px;">
+              Información de tu hogar requerida por los publicadores al solicitar una adopción:
+            </p>
+            
+            <div class="form-group">
+              <label>¿Tienes experiencia previa con gatos?</label>
+              <select class="form-control">
+                <option>Sí, actualmente tengo 1 o más gatos</option>
+                <option>Sí, he tenido en el pasado</option>
+                <option>No, sería mi primera mascota felina</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Tipo de vivienda y seguridad</label>
+              <select class="form-control">
+                <option>Departamento con mallas de seguridad en balcones</option>
+                <option>Casa con patio cerrado y seguro</option>
+                <option>Casa o departamento sin protección (requiere instalación)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>¿Toda la familia o habitantes están de acuerdo con la adopción?</label>
+              <select class="form-control">
+                <option>Sí, todos de acuerdo</option>
+                <option>En proceso de conversación</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Presupuesto estimado para alimentación y veterinario</label>
+              <input type="text" class="form-control" value="Adecuado para controles periódicos y comida premium">
+            </div>
+
+            <button type="submit" class="btn-primary" style="width:100%; margin-top:10px;">
+              <i class="fas fa-save"></i> Guardar Formulario
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Mi Cuenta -->
+    <div class="modal-overlay" id="accountModal">
+      <div class="modal-container">
+        <div class="modal-header">
+          <span class="modal-title">Mi Cuenta</span>
+          <button class="modal-close-btn"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+          <form onsubmit="event.preventDefault(); alert('¡Datos de cuenta actualizados!'); document.getElementById('accountModal').classList.remove('active');">
+            <div class="form-group">
+              <label>Nombre de usuario / Nombre completo</label>
+              <input type="text" class="form-control" value="María González" required>
+            </div>
+            <div class="form-group">
+              <label>Correo electrónico</label>
+              <input type="email" class="form-control" value="maria.gonzalez@example.com" required>
+            </div>
+            <div class="form-group">
+              <label>Teléfono de contacto</label>
+              <input type="text" class="form-control" value="+56 9 1234 5678" required>
+            </div>
+            <div class="form-group">
+              <label>Ubicación / Comuna</label>
+              <input type="text" class="form-control" value="Providencia, Santiago">
+            </div>
+            <div class="form-group">
+              <label>Contraseña nueva (opcional)</label>
+              <input type="password" class="form-control" placeholder="••••••••">
+            </div>
+
+            <button type="submit" class="btn-primary" style="width:100%; margin-top:10px;">
+              <i class="fas fa-check-circle"></i> Guardar Cambios
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Mis Publicaciones Guardadas -->
+    <div class="modal-overlay" id="savedPostsModal">
+      <div class="modal-container">
+        <div class="modal-header">
+          <span class="modal-title">Mis Publicaciones Guardadas</span>
+          <button class="modal-close-btn"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+          <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:14px;">
+            Publicaciones que has guardado en tus favoritos:
+          </p>
+
+          <div class="posts-grid">
+            <div class="grid-post-card" onclick="document.getElementById('savedPostsModal').classList.remove('active'); openAdoptionDetail({name:'Mimi', user:'Felipe S.', reputation:'★ 4.8 (12 reseñas)', date:'Hace 4 días', image:'./images/cat_white.jpg', age:'2 Meses', color:'Blanca con Gris', size:'Pequeño', socialLevel:'Celeste', description:'Mimi es curiosa y dócil.', location:'Ñuñoa, Santiago'})">
+              <div class="grid-post-img-wrapper">
+                <span class="badge-tag adopcion">Adopción</span>
+                <img src="./images/cat_white.jpg" alt="Mimi">
+              </div>
+              <div class="grid-post-body">
+                <div>
+                  <div class="grid-post-title">Mimi</div>
+                  <div class="grid-post-meta">Ñuñoa, Santiago</div>
+                </div>
+                <button class="btn-outline" style="padding:4px 8px; font-size:0.75rem; width:100%; margin-top:6px;">
+                  Ver Detalle
+                </button>
+              </div>
+            </div>
+
+            <div class="grid-post-card" onclick="document.getElementById('savedPostsModal').classList.remove('active'); showGenericModal('Arenero Automático', `<div class='gallery-container'><img src='./images/cat_litter_box.jpg'></div><p><strong>Arenero en Las Condes</strong></p>`)">
+              <div class="grid-post-img-wrapper">
+                <span class="badge-tag articulo">Artículo</span>
+                <img src="./images/cat_litter_box.jpg" alt="Arenero">
+              </div>
+              <div class="grid-post-body">
+                <div>
+                  <div class="grid-post-title">Arenero Automático</div>
+                  <div class="grid-post-meta">Las Condes</div>
+                </div>
+                <button class="btn-outline" style="padding:4px 8px; font-size:0.75rem; width:100%; margin-top:6px;">
+                  Ver Detalle
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Perfil del Usuario -->
+    <div class="modal-overlay" id="profileModal">
+      <div class="modal-container">
+        <div class="modal-header">
+          <span class="modal-title">Mi Perfil</span>
+          <button class="modal-close-btn"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+          
+          <div class="profile-header-card">
+            <div class="avatar-placeholder" style="width:80px; height:80px; font-size:2rem; margin: 0 auto 10px auto;">M</div>
+            <div style="font-size:1.2rem; font-weight:700;">María González</div>
+            <div style="font-size:0.85rem; color:var(--text-muted);"><i class="fas fa-map-marker-alt"></i> Providencia, Santiago</div>
+            <div class="reputation-badge" style="margin-top:4px; font-size:0.95rem;">★ 4.9 Reputación (24 interacciones)</div>
+          </div>
+
+          <!-- Toggle Between Adoption Posts & Articles -->
+          <div class="profile-toggle-buttons">
+            <button class="profile-toggle-btn active" id="profileTabAdop" onclick="switchProfileTab('adopciones')">
+              Publicaciones de Adopción
+            </button>
+            <button class="profile-toggle-btn" id="profileTabArt" onclick="switchProfileTab('articulos')">
+              Publicaciones de Artículos
+            </button>
+          </div>
+
+          <!-- Dynamic Container for User Posts -->
+          <div id="profilePostsContainer">
+            <div class="post-card" style="margin-top:10px;">
+              <div class="post-card-img-wrapper" style="height:120px;">
+                <img src="./images/cat_orange.jpg" alt="Oliver">
+              </div>
+              <div class="post-card-body">
+                <div style="font-weight:700;">Oliver (En Adopción)</div>
+                <div style="font-size:0.8rem; color:var(--text-muted);">Publicado hace 2 días</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Reviews Section -->
+          <div class="reviews-section">
+            <div class="section-title">Reseñas recibidas</div>
+            
+            <div class="review-card">
+              <div class="review-author">
+                <span>Camila R.</span>
+                <span class="reputation-badge">★ 5.0</span>
+              </div>
+              <p style="color:var(--text-muted);">"Excelente adoptante, muy responsable con los controles del gatito."</p>
+            </div>
+
+            <div class="review-card">
+              <div class="review-author">
+                <span>Gonzalo M.</span>
+                <span class="reputation-badge">★ 4.8</span>
+              </div>
+              <p style="color:var(--text-muted);">"Intercambio de arenero sin inconvenientes, puntual y amable."</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Menú de Inicio de Sesión -->
+    <div class="modal-overlay" id="loginModal">
+      <div class="modal-container">
+        <div class="modal-header">
+          <span class="modal-title">Menú de Inicio de Sesión</span>
+          <button class="modal-close-btn"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+          <form onsubmit="event.preventDefault(); alert('¡Inicio de sesión exitoso en la maqueta!'); document.getElementById('loginModal').classList.remove('active');">
+            
+            <div class="form-group">
+              <label for="loginName">Campo de Nombre / Usuario</label>
+              <input type="text" id="loginName" class="form-control" placeholder="Ingresa tu nombre o correo" required>
+            </div>
+
+            <div class="form-group">
+              <label for="loginPassword">Campo de Contraseña</label>
+              <input type="password" id="loginPassword" class="form-control" placeholder="Ingresa tu contraseña" required>
+            </div>
+
+            <button type="submit" class="btn-primary" style="width:100%; margin-top:10px;">
+              Botón Iniciar
+            </button>
+
+            <a class="forgot-link" onclick="alert('Opción de maqueta: Enlace para recuperar contraseña enviado a tu correo.');">
+              Botón Olvidé mi contraseña
+            </a>
+
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Generico para otras vistas del menú lateral -->
+    <div class="modal-overlay" id="genericModal">
+      <div class="modal-container">
+        <div class="modal-header">
+          <span class="modal-title" id="genericTitle">Título</span>
+          <button class="modal-close-btn"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body" id="genericBody">
+          <!-- Dynamic Content -->
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Application Script -->
+  <script src="app.js"></script>
+</body>
+</html>
